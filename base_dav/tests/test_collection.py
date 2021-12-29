@@ -21,18 +21,18 @@ class TestCalendar(TransactionCase):
         })
 
         self.create_field_mapping(
-            "login", "base.field_res_users_login",
+            "login", "base.field_res_users__login",
             excode="result = record.login",
             imcode="result = item.value",
         )
         self.create_field_mapping(
-            "name", "base.field_res_users_name",
+            "name", "base.field_res_users__name",
         )
         self.create_field_mapping(
-            "dtstart", "base.field_res_users_create_date",
+            "dtstart", "base.field_res_users__create_date",
         )
         self.create_field_mapping(
-            "dtend", "base.field_res_users_write_date",
+            "dtend", "base.field_res_users__write_date",
         )
 
         start = datetime.now()
@@ -59,8 +59,12 @@ class TestCalendar(TransactionCase):
 
         self.assertEqual((rec or self.record).login, tmp["login"])
         self.assertEqual((rec or self.record).name, tmp["name"])
-        self.assertEqual((rec or self.record).create_date, tmp["create_date"])
-        self.assertEqual((rec or self.record).write_date, tmp["write_date"])
+        self.assertEqual((rec or self.record).create_date.strftime(
+            DEFAULT_SERVER_DATETIME_FORMAT), tmp["create_date"]
+        )
+        self.assertEqual((rec or self.record).write_date.strftime(
+            DEFAULT_SERVER_DATETIME_FORMAT), tmp["write_date"]
+        )
 
     def test_import_export(self):
         # Exporting and importing should result in the same record
@@ -72,7 +76,7 @@ class TestCalendar(TransactionCase):
         self.assertEqual(rec, self.record)
 
         self.collection.field_uuid = self.env.ref(
-            "base.field_res_users_login",
+            "base.field_res_users__login",
         ).id
         rec = self.collection.get_record([self.record.login])
         self.assertEqual(rec, self.record)
